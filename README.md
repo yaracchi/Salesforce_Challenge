@@ -11,9 +11,9 @@ nodejs, expressjs, jsforce, nodemon
 * task 4:  Get all candidates /myapi/candidates
 
 # Exercices not done
-* task 5, 6, 7, 8
+* task 5, 6, 7
 
-# Extra exercices
+# Extra exercices (Task 8)
 * check the users connection information: /myapi/candidateExpert/
 * Delete a candidtae given their ID : '/myapi/candidate/:candidateID'
 * Fetch all candidates with more than 3 years experience : 
