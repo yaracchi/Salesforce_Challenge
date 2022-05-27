@@ -9,7 +9,6 @@ app.use(express.json())
 //###################################### User CREDENTIAL.#########################################################
 
 let creds = JSON.parse(fs.readFileSync(path.resolve(__dirname, './SF_creds.json')).toString());
-console.log(creds)
 
 //###################################### User authentification.####################################################
 //########### Methode 1 : Users identification once and then initiate connection when http request.#################
@@ -48,7 +47,7 @@ app.get('/myapi/token', (req, res) => {
 })
 })
 
-//######################### Methode 2 : Users identification for each request #####################
+//######################### Methode 2 : Users identification for each request(that works for me) #####################
 var conn = new jsforce.Connection({
     loginUrl: creds.instanceURL+'.my.salesforce.com/',
     ClientId : creds.clientID,
@@ -65,13 +64,12 @@ conn.login(creds.username, creds.password, function(err, userInfo) {
     if (err) { return console.error(err); }
 
     conn.sobject("Candidature__c").retrieve(req.params.candidateID , function(err, cand) {
-    if (err) { return console.error(err); }
-        console.log("First_Name__c : " + cand.First_Name__c);
-        console.log("Last_Name__c : " + cand.Last_Name__c);
-        console.log("Year__c : " + cand.Year__c);
-        console.log("Year_Of_Experience__c : " + cand.Year_Of_Experience__c);
-    
-    // ...
+        if (err) { return console.error(err); }
+            console.log("First_Name__c : " + cand.First_Name__c);
+            console.log("Last_Name__c : " + cand.Last_Name__c);
+            console.log("Year__c : " + cand.Year__c);
+            console.log("Year_Of_Experience__c : " + cand.Year_Of_Experience__c);
+  
 }) }) })
 
 //#################################### Post REQUESTS ######################
@@ -91,12 +89,11 @@ app.post('/myapi/candidate',(req,res)=>{
             Year_Of_Experience : p.Year_Of_Experience     
        }
        conn.login(creds.username, creds.password, function(err, userInfo) {
-        if (err) { return console.error(err); }
-        conn.sobject("Candidature__c").create(candidate, function(err, ret) {
-        if (err || !ret.success) { return console.error(err, ret); }
-        console.log("Created candidate name : " + ret.First_Name);
-        })
-    // ...
+            if (err) { return console.error(err); }
+            conn.sobject("Candidature__c").create(candidate, function(err, ret) {
+                if (err || !ret.success) { return console.error(err, ret); }
+                console.log("Created candidate name : " + ret.First_Name);
+                })
 });
     res.send(candidate)
   })
@@ -129,11 +126,11 @@ app.get('/myapi/candidates', (req, res) => {
    conn.login(creds.username, creds.password, function(err, userInfo) {
      if (err) { return console.error(err); }
      
-     let soql = 'SELECT First_Name__c, Last_Name__c, Year__c , Year_Of_Experience__c FROM Candidature__c ';
-     conn.query(soql, function(err, result) {
-       if (err) { return console.error(err); }
-       console.log("candidates fetched")
-       res.send(result)
+        let soql = 'SELECT First_Name__c, Last_Name__c, Year__c , Year_Of_Experience__c FROM Candidature__c ';
+        conn.query(soql, function(err, result) {
+            if (err) { return console.error(err); }
+            console.log("candidates fetched")
+            res.send(result)
      });
      
    }); })
@@ -164,15 +161,14 @@ app.delete('/myapi/candidate/:candidateID', (req,res) => {
         conn.sobject('Candidature__c')
        .find({ ID : req.params.candidateID })
        .destroy(function(err, rets) {
-         if (err) { return console.error(err); }
-         res.send(rets)
+            if (err) { return console.error(err); }
+            res.send(rets)
        });
        })
 }) 
 
 
 //Extra task: fetching all the candidates with years of experience > 3 
-
 app.get('/myapi/candidateExpert/', (req,res) => {
     conn.login(creds.username, creds.password, function(err, userInfo) {
         if (err) { return console.error(err); }
