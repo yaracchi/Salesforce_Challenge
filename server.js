@@ -6,14 +6,14 @@ var path = require('path');
 const app = express()
 app.use(express.json())
 
-//###################################### User CREDENTIAL.################################
+//###################################### User CREDENTIAL.#########################################################
 
 let creds = JSON.parse(fs.readFileSync(path.resolve(__dirname, './SF_creds.json')).toString());
 console.log(creds)
-//######################################################### User authentification.################################
-//###########################################Methode 1 : Users identification once and then initiate connection when http request
 
-//VEREFYING IDENTITY OF USER
+//###################################### User authentification.####################################################
+//########### Methode 1 : Users identification once and then initiate connection when http request.#################
+
 const authObject = new jsforce.OAuth2({
     loginUrl: creds.instanceURL+'.my.salesforce.com/',
     ClientId : creds.clientID,
@@ -23,17 +23,15 @@ const authObject = new jsforce.OAuth2({
 
 app.get("/myapi/auth/login", function(req, res) {
     console.log("/myapi/auth/login worked, SF redirected me to login page that needs the token route")
-    res.redirect(authObject.getAuthorizationUrl({scope: 'full'}));//check in app manager
+    res.redirect(authObject.getAuthorizationUrl({scope: 'full'}));
   });
-//**** error is in the auth callback: invalid_client_id: client identifier invalid */
-//*****ERROR error=invalid_client_id&error_description=client%20identifier%20invalid */
 app.get('/myapi/token', (req, res) => {
     const connect = new jsforce.Connection({oauth2: authObject});
     
     connect.login(creds.username, creds.password, function(err, userInfo) {
     if (err) { return console.error(err); }const code = req.query.code;
     conn.authorize(code, function(err, userInfo) {
-        if (err) { return console.error("This error is in the auth callback: " + err); }//******* */
+        if (err) { return console.error("This error is in the auth callback: " + err); }//**stops here */
         // Now you can get the access token and instance URL information.
         console.log('Access Token: ' + conn.accessToken);
         console.log('Instance URL: ' + conn.instanceUrl);
@@ -50,16 +48,18 @@ app.get('/myapi/token', (req, res) => {
 })
 })
 
-//########################################### Methode 2 : Users identification for each request
+//######################### Methode 2 : Users identification for each request #####################
 var conn = new jsforce.Connection({
     loginUrl: creds.instanceURL+'.my.salesforce.com/',
     ClientId : creds.clientID,
     clientSecret : creds.clientSecret,
-    redirectUri : 'http://localhost:1000/myapi/token'//******BE WARRY OF, check if same as in app SF connected */
+    redirectUri : 'http://localhost:1000/myapi/token'
   });
-//#################################### GET REQUESTS ######################
+
+//#################################### GET REQUESTS #########################
 //task 1 : Fetch a given candidate
 app.get('/myapi/candidate/:candidateID', (req, res) => {
+    //to use in postman params
     //ID = "a004L000002gCJK"
 conn.login(creds.username, creds.password, function(err, userInfo) {
     if (err) { return console.error(err); }
@@ -72,10 +72,7 @@ conn.login(creds.username, creds.password, function(err, userInfo) {
         console.log("Year_Of_Experience__c : " + cand.Year_Of_Experience__c);
     
     // ...
-})
-
-}) })
-
+}) }) })
 
 //#################################### Post REQUESTS ######################
 //Task 2 : add new candidate with my data
@@ -108,7 +105,7 @@ app.post('/myapi/candidate',(req,res)=>{
 //Task 3: Edit Last_Name__c
 
 app.put('/myapi/candidate/:candidateID',(req,res)=>{
-    //in postman
+    //to use in in postman
     //params: candidateID = "a004L000002gCJK"
     //body { "Id" : 'a004L000002gCJK', "Last_Name__c" : "El mhamid" }
    let    candidate = { 
@@ -122,7 +119,6 @@ app.put('/myapi/candidate/:candidateID',(req,res)=>{
            if (err || !ret.success) { return console.error(err, ret); }
            console.log('Updated Successfully : ' + ret.id);
            res.send(ret)
-           // ...
          });
    })
 })
@@ -141,6 +137,7 @@ app.get('/myapi/candidates', (req, res) => {
      });
      
    }); })
+
 //#################################### GET REQUESTS ######################
 //Task 5 : Searching a candidate using their Name
 
@@ -159,8 +156,39 @@ app.get('/myapi/',(req,res) =>{
 })
 
 //#################################### DELETE REQUESTS ######################
-//Extra task: Delete a condidate using the ID
+//Extra task: Delete a candidate using their ID
 
+app.delete('/myapi/candidate/:candidateID', (req,res) => {
+    conn.login(creds.username, creds.password, function(err, userInfo) {
+        if (err) { return console.error(err); }
+        conn.sobject('Candidature__c')
+       .find({ ID : req.params.candidateID })
+       .destroy(function(err, rets) {
+         if (err) { return console.error(err); }
+         res.send(rets)
+       });
+       })
+}) 
+
+
+//Extra task: fetching all the candidates with years of experience > 3 
+
+app.get('/myapi/candidateExpert/', (req,res) => {
+    conn.login(creds.username, creds.password, function(err, userInfo) {
+        if (err) { return console.error(err); }
+        conn.sobject("Candidature__c")
+        .select('*, Candidature__c.*') // asterisk means all fields in specified level are targeted.
+        .where("Year_Of_Experience__c >= 3") // conditions in raw SOQL where clause.
+        .execute(function(err, candidate) {
+            for (var i=0; i<candidate.length; i++) {
+                var record = candidate[i];
+                console.log("First_Name: " + candidate.First_Name__c);
+                console.log("Year_Of_Experience__c: " + candidate.Year_Of_Experience__c);
+    }
+    });
+    res.send("fetch succeded")
+  })
+})
 
 
 const port = process.env.PORT || 1000
