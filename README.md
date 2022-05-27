@@ -1,26 +1,24 @@
 # Salesforce_Challenge
 This is a mini project that represents an REST API that communicates with SF API in order to get and treat data
 echnologies used are:
+
 # Technologies used:
-nodejs expressjs jsforce nodemon
+nodejs, expressjs, jsforce, nodemon
 
-# How to run the project:
-after cloning the git repository, run npm install to get the node_modules
-node or nodemon server.js
-each http request is defined by its URL using the 
+# Clarification on the tests
+As i couldnt authentificate your SF user, i used my own SF user that i created with dev edition.
+Nnowing that the sobject of candidature is not available in my SF account, i used the Account object in order to test my Endpoints logic.
 
+# Exercices done with their Endpoints
+* task 1: /myapi/
+* task 2: /myapi/
+* task 3: /myapi/
+* task 4: /myapi/
 
-# Exercices done
-* e
+# Exercices not done
+* task 5, 6, 7, 8
 
-# Exercices i didnt have time to code but here is some explanation of what i would have done:
-
-* e
-
-
-# Endoints
-GET /SFapi/../
-GET /SFapi/../1
-PUT /SFapi/../1
-DELETE/SFapi/../1
-POST /SFapi/../
+# Extra
+* check the users information: /myapi/
+* Delete a candidtae given their ID : 
+* Fetch all candidates with more than 3 years experience : 
