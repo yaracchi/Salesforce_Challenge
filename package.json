@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "express": "^4.18.1",
+    "jsforce": "^1.11.0"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "name": "salesforce_challenge",
+  "description": "This is a mini project that represents an REST API that communicates with SF API in order to get and treat data",
+  "version": "1.0.0",
+  "main": "server.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yaracchi/Salesforce_Challenge.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yaracchi/Salesforce_Challenge/issues"
+  },
+  "homepage": "https://github.com/yaracchi/Salesforce_Challenge#readme"
+}
