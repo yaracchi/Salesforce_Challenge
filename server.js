@@ -9,7 +9,7 @@ app.use(express.json())
 //###################################### User CREDENTIAL.################################
 
 let creds = JSON.parse(fs.readFileSync(path.resolve(__dirname, './SF_creds.json')).toString());
-
+console.log(creds)
 //######################################################### User authentification.################################
 //###########################################Methode 1 : Users identification once and then initiate connection when http request
 
@@ -57,28 +57,109 @@ var conn = new jsforce.Connection({
     clientSecret : creds.clientSecret,
     redirectUri : 'http://localhost:1000/myapi/token'//******BE WARRY OF, check if same as in app SF connected */
   });
+//#################################### GET REQUESTS ######################
+//task 1 : Fetch a given candidate
+app.get('/myapi/candidate/:candidateID', (req, res) => {
+    //ID = "a004L000002gCJK"
+conn.login(creds.username, creds.password, function(err, userInfo) {
+    if (err) { return console.error(err); }
+
+    conn.sobject("Candidature__c").retrieve(req.params.candidateID , function(err, cand) {
+    if (err) { return console.error(err); }
+        console.log("First_Name__c : " + cand.First_Name__c);
+        console.log("Last_Name__c : " + cand.Last_Name__c);
+        console.log("Year__c : " + cand.Year__c);
+        console.log("Year_Of_Experience__c : " + cand.Year_Of_Experience__c);
+    
+    // ...
+})
+
+}) })
+
+
+//#################################### Post REQUESTS ######################
+//Task 2 : add new candidate with my data
+
+app.post('/myapi/candidate',(req,res)=>{
+    //to use in postman
+   /* const cand = {
+        "First_Name" : "yara" , 
+        "Last_Name" : "elmhamid" ,
+        "Year_Of_Experience" : 1     
+       }*/
+       const p = req.body
+       const candidate = {
+            First_Name : p.First_Name , 
+            Last_Name : p.Last_Name ,
+            Year_Of_Experience : p.Year_Of_Experience     
+       }
+       conn.login(creds.username, creds.password, function(err, userInfo) {
+        if (err) { return console.error(err); }
+        conn.sobject("Candidature__c").create(candidate, function(err, ret) {
+        if (err || !ret.success) { return console.error(err, ret); }
+        console.log("Created candidate name : " + ret.First_Name);
+        })
+    // ...
+});
+    res.send(candidate)
+  })
+
+//#################################### UPDATE REQUESTS ######################
+//Task 3: Edit Last_Name__c
+
+app.put('/myapi/candidate/:candidateID',(req,res)=>{
+    //in postman
+    //params: candidateID = "a004L000002gCJK"
+    //body { "Id" : 'a004L000002gCJK', "Last_Name__c" : "El mhamid" }
+   let    candidate = { 
+       Id : req.body.Id,
+       Last_Name__c : req.body.Last_Name__c
+     }
+       conn.login(creds.username, creds.password, function(err, userInfo) {
+            if (err) { return console.error(err); }
+      
+       conn.sobject("Candidature__c").update(candidate , function(err, ret) {
+           if (err || !ret.success) { return console.error(err, ret); }
+           console.log('Updated Successfully : ' + ret.id);
+           res.send(ret)
+           // ...
+         });
+   })
+})
 
 //#################################### GET REQUESTS ######################
-//fetching the accounts of my companies
-app.get('/myapi/accounts', (req, res) => {
-    //i am logging eachtime manually and not using the authentif session info   
+//Task 4 : Get all candidates
+app.get('/myapi/candidates', (req, res) => {
    conn.login(creds.username, creds.password, function(err, userInfo) {
      if (err) { return console.error(err); }
-     let soql = 'SELECT id, Site, name FROM account LIMIT 5';
-     conn.query(soql, function(err, result1) {
+     
+     let soql = 'SELECT First_Name__c, Last_Name__c, Year__c , Year_Of_Experience__c FROM Candidature__c ';
+     conn.query(soql, function(err, result) {
        if (err) { return console.error(err); }
-       res.send(result1)
+       console.log("candidates fetched")
+       res.send(result)
      });
      
    }); })
-//#################################### POST REQUESTS ######################
-//Single 
+//#################################### GET REQUESTS ######################
+//Task 5 : Searching a candidate using their Name
 
-//multiple
-
-//#################################### UPDATE REQUESTS ######################
+//############################# User Login Credential check ######################
+//Extra task: Check the user credentials
+app.get('/myapi/',(req,res) =>{
+    conn.login(creds.username, creds.password, function(err, userInfo) {
+        if (err) { return console.error(err); }
+        console.log("User ID: " + userInfo.id); 
+        console.log("Org ID: " + userInfo.organizationId); 
+        console.log("Access token: " + conn.accessToken); 
+        console.log("Instance URL: " + conn.instanceUrl);
+        res.send(userInfo)
+    })
+    
+})
 
 //#################################### DELETE REQUESTS ######################
+//Extra task: Delete a condidate using the ID
 
 
 
