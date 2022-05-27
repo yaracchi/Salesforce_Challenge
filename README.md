@@ -5,7 +5,7 @@ This is a mini project that represents a REST API creation that communicates wit
 nodejs, expressjs, jsforce, nodemon
 
 # Exercices done with their Endpoints
-* task 1:  Fetch a given candidate usign their ID /myapi/candidate/:candidateID'
+* task 1:  Fetch a given candidate using their ID /myapi/candidate/:candidateID'
 * task 2:  Add new candidate with my data : /myapi/candidate
 * task 3:  Edit Last_Name of a given candidate /myapi/candidate/:candidateID
 * task 4:  Get all candidates /myapi/candidates
