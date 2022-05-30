@@ -59,7 +59,7 @@ var conn = new jsforce.Connection({
 //task 1 : Fetch a given candidate
 app.get('/myapi/candidate/:candidateID', (req, res) => {
     //to use in postman params
-    //ID = "a004L000002gCJK"
+    //ID = a004L000002gCJK
 conn.login(creds.username, creds.password, function(err, userInfo) {
     if (err) { return console.error(err); }
 
@@ -78,21 +78,21 @@ conn.login(creds.username, creds.password, function(err, userInfo) {
 app.post('/myapi/candidate',(req,res)=>{
     //to use in postman
    /* const cand = {
-        "First_Name" : "yara" , 
-        "Last_Name" : "elmhamid" ,
-        "Year_Of_Experience" : 1     
+        "First_Name__c" : "yara" , 
+        "Last_Name__c" : "elmhamid" ,
+        "Year_Of_Experience__c" : 1     
        }*/
        const p = req.body
        const candidate = {
-            First_Name : p.First_Name , 
-            Last_Name : p.Last_Name ,
-            Year_Of_Experience : p.Year_Of_Experience     
+            First_Name__c : p.First_Name__c , 
+            Last_Name__c : p.Last_Name__c ,
+            Year_Of_Experience__c : p.Year_Of_Experience__c     
        }
        conn.login(creds.username, creds.password, function(err, userInfo) {
             if (err) { return console.error(err); }
             conn.sobject("Candidature__c").create(candidate, function(err, ret) {
                 if (err || !ret.success) { return console.error(err, ret); }
-                console.log("Created candidate name : " + ret.First_Name);
+                console.log(ret)
                 })
 });
     res.send(candidate)
@@ -103,8 +103,8 @@ app.post('/myapi/candidate',(req,res)=>{
 
 app.put('/myapi/candidate/:candidateID',(req,res)=>{
     //to use in in postman
-    //params: candidateID = "a004L000002gCJK"
-    //body { "Id" : 'a004L000002gCJK', "Last_Name__c" : "El mhamid" }
+    //params: candidateID = a004L000002gCJK
+    //body { "Id" : "a004L000002gCJK", "Last_Name__c" : "El mhamid" }
    let    candidate = { 
        Id : req.body.Id,
        Last_Name__c : req.body.Last_Name__c
@@ -129,7 +129,7 @@ app.get('/myapi/candidates', (req, res) => {
         let soql = 'SELECT First_Name__c, Last_Name__c, Year__c , Year_Of_Experience__c FROM Candidature__c ';
         conn.query(soql, function(err, result) {
             if (err) { return console.error(err); }
-            console.log("candidates fetched")
+            console.log("candidates fetched: "+ result.totalSize)
             res.send(result)
      });
      
@@ -154,7 +154,7 @@ app.get('/myapi/',(req,res) =>{
 
 //#################################### DELETE REQUESTS ######################
 //Extra task: Delete a candidate using their ID
-
+//id = a004L000002gCJK
 app.delete('/myapi/candidate/:candidateID', (req,res) => {
     conn.login(creds.username, creds.password, function(err, userInfo) {
         if (err) { return console.error(err); }
@@ -162,6 +162,7 @@ app.delete('/myapi/candidate/:candidateID', (req,res) => {
        .find({ ID : req.params.candidateID })
        .destroy(function(err, rets) {
             if (err) { return console.error(err); }
+            console.log(rets)
             res.send(rets)
        });
        })
@@ -175,14 +176,15 @@ app.get('/myapi/candidateExpert/', (req,res) => {
         conn.sobject("Candidature__c")
         .select('*, Candidature__c.*') // asterisk means all fields in specified level are targeted.
         .where("Year_Of_Experience__c >= 3") // conditions in raw SOQL where clause.
-        .execute(function(err, candidate) {
-            for (var i=0; i<candidate.length; i++) {
-                var record = candidate[i];
-                console.log("First_Name: " + candidate.First_Name__c);
-                console.log("Year_Of_Experience__c: " + candidate.Year_Of_Experience__c);
+        .execute(function(err, candidates) {
+            for (var i=0; i<candidates.length; i++) {
+                var record = candidates[i];
+                console.log("First_Name: " + record.First_Name__c);
+                console.log("Year_Of_Experience__c: " + record.Year_Of_Experience__c);
     }
+    res.send(candidates)
     });
-    res.send("fetch succeded")
+   
   })
 })
 
