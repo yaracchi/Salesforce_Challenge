@@ -14,7 +14,7 @@ let creds = JSON.parse(fs.readFileSync(path.resolve(__dirname, './SF_creds.json'
 //########### Methode 1 : Users identification once and then initiate connection when http request.#################
 
 const authObject = new jsforce.OAuth2({
-    loginUrl: creds.instanceURL+'.my.salesforce.com/',
+    loginUrl: creds.instanceURL,
     ClientId : creds.clientID,
     clientSecret : creds.clientSecret,
     redirectUri : 'http://localhost:1000/myapi/token' 
@@ -22,11 +22,11 @@ const authObject = new jsforce.OAuth2({
 
 app.get("/myapi/auth/login", function(req, res) {
     console.log("/myapi/auth/login worked, SF redirected me to login page that needs the token route")
-    res.redirect(authObject.getAuthorizationUrl({scope: 'full'}));
+    res.redirect(authObject.getAuthorizationUrl({scope: 'full'}));//***** */
   });
 app.get('/myapi/token', (req, res) => {
     const connect = new jsforce.Connection({oauth2: authObject});
-    
+    console.log("redirected to /token")
     connect.login(creds.username, creds.password, function(err, userInfo) {
     if (err) { return console.error(err); }const code = req.query.code;
     conn.authorize(code, function(err, userInfo) {
@@ -49,7 +49,7 @@ app.get('/myapi/token', (req, res) => {
 
 //######################### Methode 2 : Users identification for each request(that works for me) #####################
 var conn = new jsforce.Connection({
-    loginUrl: creds.instanceURL+'.my.salesforce.com/',
+    loginUrl: creds.instanceURL,
     ClientId : creds.clientID,
     clientSecret : creds.clientSecret,
     redirectUri : 'http://localhost:1000/myapi/token'
@@ -99,7 +99,7 @@ app.post('/myapi/candidate',(req,res)=>{
   })
 
 //#################################### UPDATE REQUESTS ######################
-//Task 3: Edit Last_Name__c
+//Task 3: Edit Last_Name__c with my last name
 
 app.put('/myapi/candidate/:candidateID',(req,res)=>{
     //to use in in postman
