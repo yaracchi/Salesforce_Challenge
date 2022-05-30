@@ -19,7 +19,11 @@ Just run "nodemon Server.js" in order to execute the code
 * Delete a candidtae given their ID : '/myapi/candidate/:candidateID'
 * Fetch all candidates with more than 3 years experience : 
 
-# Clarification on the tests
-As i couldnt authentificate the SF user provided by Soljit, i used my own SF user credentials that i created with a dev edition.
-Knowing that the Candidature__c object is not available in my SF account, i used the Account object in order to test my Endpoints and the logic of my solutions.
-Link to the tests done using my SF account: https://drive.google.com/drive/u/2/folders/1TRHzysHNpcCNa3Oi972iTqb49JWzLH3Y 
+# Clarification on the tests [edited]
+I used soljit credentials in order to access to SF programmatically.
+
+Link to the code execution: https://drive.google.com/drive/u/2/folders/1Uyfc4uyPez2XCbADCAkit3z7ZyVNA6qz
+
+(As i couldnt authentificate the SF user provided by Soljit, i used my own SF user credentials that i created with a dev edition.
+Knowing that the Candidature__c object is not available in my SF account, i used the Account object in order to test my Endpoints and the logic of my solutions.)
+
